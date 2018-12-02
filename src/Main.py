@@ -12,7 +12,7 @@ data = np.zeros((max_num_agents, 4))
 data[0:num_agents, [0, 1]] = (np.random.random(size=(num_agents, 2)) * p_max * 2-p_max)*0.9
 
 def get_drift_velocty(i):
-    drift_velocity = 0.1
+    drift_velocity = 0.05+ np.random.rand()*0.5
     if i<=num_agents/2:
         return np.array([drift_velocity, 0])
     else:
@@ -26,8 +26,9 @@ def get_closest_wall_point(p):
 
 
 
-agent_repulsion_strength = 0.01
-wall_repulsion_strength = 0.05
+agent_repulsion_strength = 0.1
+wall_repulsion_strength = 0.1
+time_step = 0.3
 
 def update_agents(data):
     for i in range(num_agents):
@@ -49,8 +50,8 @@ def update_agents(data):
         if np.dot(f, f) > np.dot(max_force, max_force):
             max_force = f
         v += max_force
-        p += v
-        v *= 0.5
+        p += v*time_step
+        v *= 0.5*time_step
 
         p[0] = (p[0] + x_max) % (x_max*2) - x_max
 
@@ -60,18 +61,19 @@ def update_agents(data):
 def plot_agents(data):
     x = data[0:num_agents, 0]
     y = data[0:num_agents, 1]
-    plt.cla()
-    plt.scatter(x, y)
+    #plt.cla()
+    c = plt.scatter(x, y, c ='b')
     plt.xlim(-x_max, x_max)
     plt.ylim(-y_max, y_max)
 
     plt.show()
     plt.pause(.001)
+    c.remove()
 
 
 def main():
     plt.ion()
-    for i in range(100):
+    for i in range(1000):
         update_agents(data)
         plot_agents(data)
 
