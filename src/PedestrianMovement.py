@@ -1,12 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as plt_patches
-from PedSim import *
 
+from PedSim import *
 from matplotlib.collections import PatchCollection
 
 pedestrian_radius = 0.1
-search_radius = 10*pedestrian_radius
+search_radius = 10 * pedestrian_radius
 num_agents = 100
 w = 10
 h = 5
@@ -26,14 +26,17 @@ def angle_from_index(i):
     else:
         return np.pi
 
+def init_y():
+    return np.random.rand() * h
+
 for i in range(num_agents):
     r = np.random.rand() * w
     x_coordinates[i] = r
     direction[i] = angle_from_index(i)
-
-    y_coordinates[i] = np.random.rand() * h
-
+    y_coordinates[i] = init_y()
     velocities[i] = (0.1 + 0.9 * np.random.rand())*3.2
+
+
 
 #Add wall obstacle
 upper_wall_x = np.linspace(0, w, 100)
@@ -110,7 +113,7 @@ patches = []
 
 def init_plotting():
     plt.ion()
-    d = plt.scatter(x_coordinates[num_agents:], y_coordinates[num_agents:], c = 'r', s = 15)
+    plt.scatter(x_coordinates[num_agents:], y_coordinates[num_agents:], c = 'r', s = 15)
 
     for i in range(0, num_agents):
         circle = plt_patches.Circle((i, i), pedestrian_radius, color='g')
@@ -149,11 +152,17 @@ if __name__ == '__main__':
                 x_coordinates[j] += dx * v * t
                 y_coordinates[j] += dy * v * t
                 direction[j] = lerp_angle(theta, angle_from_index(j), 0.5)
-
             else:
                 desired_x, desired_y = try_move(x, y, theta, v)
                 x, y = check_for_collisions(desired_x, desired_y, theta, v)
                 x_coordinates[j] = x
                 y_coordinates[j] = y
+
+            if(x_coordinates[j] > w):
+                init_y()
+                x_coordinates[j] = 0
+            elif x_coordinates[j] < 0:
+                init_y()
+                x_coordinates[j] = w
 
         plot(x_coordinates, y_coordinates)

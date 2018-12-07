@@ -63,5 +63,5 @@ def get_best_direction(x, y, xs, ys, angle, search_radius, pedestrian_radius):
         else:
             return get_best_direction(x, y, xs, ys, angle, search_radius, pedestrian_radius)
 
-    return np.cos(new_angle), np.sin(new_angle),angle
+    return np.cos(new_angle), np.sin(new_angle), angle
 
