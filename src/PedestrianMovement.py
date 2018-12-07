@@ -7,7 +7,7 @@ from matplotlib.collections import PatchCollection
 
 pedestrian_radius = 0.1
 search_radius = 10 * pedestrian_radius
-num_agents = 100
+num_agents = 200
 w = 10
 h = 5
 t = 0.01
@@ -34,7 +34,7 @@ for i in range(num_agents):
     x_coordinates[i] = r
     direction[i] = angle_from_index(i)
     y_coordinates[i] = init_y()
-    velocities[i] = (0.1 + 0.9 * np.random.rand())*3.2
+    velocities[i] = (0.5 + 0.1 * np.random.rand())*3.2
 
 
 
@@ -51,7 +51,7 @@ for i in range(100):
     y_coordinates[num_agents+100+i] = lower_wall_y[i]
 
 #Add some obstacle in the walkway.
-for i in range(10):
+for i in range(1):
     for j in range(10):
         x_coordinates[num_agents+200+10*i + j] = 5+0.1*i + 0.1*j
         y_coordinates[num_agents+200+10*i + j] = 2 + 0.1*j
@@ -141,6 +141,7 @@ if __name__ == '__main__':
 
     for i in range(1000):
         update_pos(x_coordinates, y_coordinates)
+        x_coordinates,y_coordinates = collision_resoluton(x_coordinates, y_coordinates, pedestrian_radius)
         for j in range(num_agents):
 
             x = x_coordinates[j]
@@ -158,11 +159,10 @@ if __name__ == '__main__':
                 x_coordinates[j] = x
                 y_coordinates[j] = y
 
-            if(x_coordinates[j] > w):
+            if(x_coordinates[j] > w+pedestrian_radius):
                 init_y()
                 x_coordinates[j] = 0
-            elif x_coordinates[j] < 0:
+            elif x_coordinates[j] < 0-pedestrian_radius:
                 init_y()
                 x_coordinates[j] = w
-
         plot(x_coordinates, y_coordinates)

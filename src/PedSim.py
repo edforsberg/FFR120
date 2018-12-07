@@ -16,6 +16,22 @@ def get_points_within_radius(p, xs, ys, radius):
 
     return np.array([x2, y2])
 
+def collision_resoluton(xs, ys, radius):
+    ic = kdtree.query_ball_tree(kdtree, radius*2)
+
+    for i in range(len(ic)):
+        for j in ic[i]:
+            if i >= j:
+                continue
+            dx = xs[i]-xs[j]
+            dy = ys[i]-ys[j]
+            d = np.sqrt(dx*dx + dy*dy)
+            xs[i] = xs[j] + dx / d * radius*2
+            ys[i] = ys[j] + dy / d * radius*2
+            xs[j] = xs[i] - dx / d * radius*2
+            ys[j] = ys[i] - dy / d * radius*2
+
+    return xs, ys
 
 
 def wrapped_diff(a, b, wrapping):
@@ -50,13 +66,14 @@ def get_best_direction(x, y, xs, ys, angle, search_radius, pedestrian_radius):
     if not np.any(valid_angles):
         search_radius *= 0.5
         if search_radius < pedestrian_radius:
-            return 0, 0, angle
+            #dx, dy = collision_resolution(x, y, pedestrian_radius)
+            return 0, 0, (angle + np.random.random()*0.5)%(2*np.pi);
         else:
             return get_best_direction(x, y, xs, ys, angle, search_radius, pedestrian_radius)
     best_angle_idx = wrapped_diff(valid_angles, angle, 2*np.pi).argmin()
     new_angle = valid_angles[best_angle_idx]
 
-    if wrapped_diff(new_angle, angle, 2*np.pi) > np.pi:
+    if wrapped_diff(new_angle, angle, 2*np.pi) > np.pi/2.:
         search_radius *= 0.5
         if search_radius < pedestrian_radius:
             return 0, 0, angle

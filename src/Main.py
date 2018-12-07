@@ -7,7 +7,7 @@ y_max = 5
 p_max = np.array([x_max, y_max])
 
 max_num_agents = 100
-num_agents = 100
+num_agents = 200
 data = np.zeros((max_num_agents, 4))
 data[0:num_agents, [0, 1]] = (np.random.random(size=(num_agents, 2)) * p_max * 2-p_max)*0.9
 
