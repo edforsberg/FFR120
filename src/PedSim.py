@@ -2,7 +2,6 @@ import numpy as np
 from scipy.spatial import cKDTree
 
 def get_blocking_width(dist, rad):
-
     return np.arcsin(np.minimum((2*rad)/dist, 1.)) *1.1;
 
 def update_pos(xs, ys):
@@ -17,9 +16,19 @@ def get_points_within_radius(p, xs, ys, radius):
 
     return np.array([x2, y2])
 
+
+
 def wrapped_diff(a, b, wrapping):
     diff = np.abs(a-b)
     return np.minimum(diff, wrapping-diff)
+
+def lerp_angle(a, b, t):
+    diff = b-a
+    diff_wrapped = -np.pi*2+diff
+    if abs(diff) > abs(diff_wrapped):
+        return b + diff_wrapped*t
+    else:
+        return a + diff*t
 
 
 def get_best_direction(x, y, xs, ys, angle, search_radius, pedestrian_radius):

@@ -33,7 +33,7 @@ for i in range(num_agents):
 
     y_coordinates[i] = np.random.rand() * h
 
-    velocities[i] = (0.1 + 0.9 * np.random.rand())*2.2
+    velocities[i] = (0.1 + 0.9 * np.random.rand())*3.2
 
 #Add wall obstacle
 upper_wall_x = np.linspace(0, w, 100)
@@ -148,6 +148,8 @@ if __name__ == '__main__':
                 dx, dy, theta = get_best_direction(x, y, x_coordinates, y_coordinates, theta, search_radius, pedestrian_radius)
                 x_coordinates[j] += dx * v * t
                 y_coordinates[j] += dy * v * t
+                direction[j] = lerp_angle(theta, angle_from_index(j), 0.5)
+
             else:
                 desired_x, desired_y = try_move(x, y, theta, v)
                 x, y = check_for_collisions(desired_x, desired_y, theta, v)
