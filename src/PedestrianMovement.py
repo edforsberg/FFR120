@@ -148,6 +148,7 @@ def sim(p_num_agents, num_its, do_plot):
         init_plotting()
     global x_coordinates, y_coordinates
     kl = 0
+    teq = num_its/4;
     for i in range(num_its):
         update_pos(x_coordinates, y_coordinates)
         x_coordinates,y_coordinates = collision_resoluton(x_coordinates, y_coordinates, pedestrian_radius)
@@ -177,19 +178,18 @@ def sim(p_num_agents, num_its, do_plot):
 
         if do_plot:
             plot(x_coordinates, y_coordinates)
-
-        kl = kl + keep_left(y_coordinates[0:num_agents], h, direction)
-    return kl/num_its
+        if i > teq:
+            kl = kl + keep_left(y_coordinates[0:num_agents], h, direction)
+    return kl/(num_its-teq)
 
 if __name__ == '__main__':
-    min_peds = 20
-    max_peds = 100
-    kl = np.zeros(max_peds-min_peds)
+    peds = range(20, 100, 10)
+    kl = np.zeros(len(peds))
 
-    for i in range(min_peds, max_peds):
-        kl[i-min_peds] = sim(i, 1000, False)
+    for it, i in enumerate(peds):
+        kl[it] = sim(i, 1000, False)
         print(i)
-    plt.plot(range(min_peds, max_peds), kl)
+    plt.plot(peds, kl)
     plt.show()
     print(kl)
 
