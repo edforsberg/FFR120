@@ -198,6 +198,7 @@ if __name__ == '__main__':
 
         print(i)
     plt.plot(peds, kl)
+    plt.plot(peds, avg_speed)
     plt.show()
     print(kl)
 
