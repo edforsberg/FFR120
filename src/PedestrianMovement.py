@@ -4,21 +4,16 @@ import matplotlib.patches as plt_patches
 
 from PedSim import *
 from matplotlib.collections import PatchCollection
-
+from KeepLeft import *
 pedestrian_radius = 0.1
 search_radius = 10 * pedestrian_radius
-num_agents = 200
+global num_agents
 w = 10
 h = 5
 t = 0.01
 
 
 obstacle_side = 20*2
-
-x_coordinates = np.zeros((num_agents+300, 1))
-y_coordinates = np.zeros((num_agents+300, 1))
-velocities = np.zeros((num_agents, 1))
-direction = np.zeros((num_agents, 1))
 
 def angle_from_index(i):
     if i < num_agents * 0.5:
@@ -29,32 +24,40 @@ def angle_from_index(i):
 def init_y():
     return np.random.rand() * h
 
-for i in range(num_agents):
-    r = np.random.rand() * w
-    x_coordinates[i] = r
-    direction[i] = angle_from_index(i)
-    y_coordinates[i] = init_y()
-    velocities[i] = (0.5 + 0.1 * np.random.rand())*3.2
 
+def init(p_num_agents):
+    global x_coordinates, y_coordinates, velocities, direction, num_agents
+    num_agents = p_num_agents
 
+    x_coordinates = np.zeros((num_agents + 300, 1))
+    y_coordinates = np.zeros((num_agents + 300, 1))
+    velocities = np.zeros((num_agents, 1))
+    direction = np.zeros((num_agents, 1))
 
-#Add wall obstacle
-upper_wall_x = np.linspace(0, w, 100)
-upper_wall_y = np.ones(100)*h
-lower_wall_x = np.linspace(0, w, 100)
-lower_wall_y = np.zeros(100)
-for i in range(100):
-    x_coordinates[num_agents+i] = upper_wall_x[i]
-    x_coordinates[num_agents+100+i] = lower_wall_x[i]
+    for i in range(num_agents):
+        r = np.random.rand() * w
+        x_coordinates[i] = r
+        direction[i] = angle_from_index(i)
+        y_coordinates[i] = init_y()
+        velocities[i] = (0.5 + 0.1 * np.random.rand()) * 3.2
 
-    y_coordinates[num_agents+i] = upper_wall_y[i]
-    y_coordinates[num_agents+100+i] = lower_wall_y[i]
+    # Add wall obstacle
+    upper_wall_x = np.linspace(0, w, 100)
+    upper_wall_y = np.ones(100) * h
+    lower_wall_x = np.linspace(0, w, 100)
+    lower_wall_y = np.zeros(100)
+    for i in range(100):
+        x_coordinates[num_agents + i] = upper_wall_x[i]
+        x_coordinates[num_agents + 100 + i] = lower_wall_x[i]
 
-#Add some obstacle in the walkway.
-for i in range(1):
-    for j in range(10):
-        x_coordinates[num_agents+200+10*i + j] = 5+0.1*i + 0.1*j
-        y_coordinates[num_agents+200+10*i + j] = 2 + 0.1*j
+        y_coordinates[num_agents + i] = upper_wall_y[i]
+        y_coordinates[num_agents + 100 + i] = lower_wall_y[i]
+
+    # Add some obstacle in the walkway.
+    for i in range(1):
+        for j in range(10):
+            x_coordinates[num_agents + 200 + 10 * i + j] = 5 + 0.1 * i + 0.1 * j
+            y_coordinates[num_agents + 200 + 10 * i + j] = 2 + 0.1 * j
 
 
 def try_move(x, y, d, v):
@@ -134,12 +137,18 @@ def plot(x, y):
     plt.pause(0.001)
     c.remove()
 
+
+
+
 new_movement = True
 
-if __name__ == '__main__':
-    init_plotting()
-
-    for i in range(1000):
+def sim(p_num_agents, num_its, do_plot):
+    init(p_num_agents)
+    if do_plot:
+        init_plotting()
+    global x_coordinates, y_coordinates
+    kl = 0
+    for i in range(num_its):
         update_pos(x_coordinates, y_coordinates)
         x_coordinates,y_coordinates = collision_resoluton(x_coordinates, y_coordinates, pedestrian_radius)
         for j in range(num_agents):
@@ -165,4 +174,22 @@ if __name__ == '__main__':
             elif x_coordinates[j] < 0-pedestrian_radius:
                 init_y()
                 x_coordinates[j] = w
-        plot(x_coordinates, y_coordinates)
+
+        if do_plot:
+            plot(x_coordinates, y_coordinates)
+
+        kl = kl + keep_left(y_coordinates[0:num_agents], h, direction)
+    return kl/num_its
+
+if __name__ == '__main__':
+    min_peds = 20
+    max_peds = 100
+    kl = np.zeros(max_peds-min_peds)
+
+    for i in range(min_peds, max_peds):
+        kl[i-min_peds] = sim(i, 1000, False)
+        print(i)
+    plt.plot(range(min_peds, max_peds), kl)
+    plt.show()
+    print(kl)
+
