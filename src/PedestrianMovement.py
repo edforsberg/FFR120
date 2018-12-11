@@ -27,12 +27,25 @@ def init_y():
     return np.random.rand() * h
 
 
-def init(p_num_agents):
+def init(p_num_agents, wall_index):
     global x_coordinates, y_coordinates, velocities, direction, num_agents
     num_agents = p_num_agents
 
-    x_coordinates = np.zeros((num_agents + 300, 1))
-    y_coordinates = np.zeros((num_agents + 300, 1))
+    if wall_index == 1:
+        wall_size = 20
+        wall_inclination = 0.5
+    elif wall_index == 2:
+        wall_size = 10
+        wall_inclination = 1
+    elif wall_index == 3:
+        wall_size = 20
+        wall_inclination = 1
+    else:
+        wall_size = 0
+        wall_inclination = 0
+
+    x_coordinates = np.zeros((num_agents + 200 + wall_size, 1))
+    y_coordinates = np.zeros((num_agents + 200 + wall_size, 1))
     velocities = np.zeros((num_agents, 1))
     direction = np.zeros((num_agents, 1))
 
@@ -56,10 +69,10 @@ def init(p_num_agents):
         y_coordinates[num_agents + 100 + i] = lower_wall_y[i]
 
     # Add some obstacle in the walkway.
-    for i in range(1):
-        for j in range(10):
-            x_coordinates[num_agents + 200 + 10 * i + j] = 5 + 0.1 * i + 0.1 * j
-            y_coordinates[num_agents + 200 + 10 * i + j] = 2 + 0.1 * j
+    for j in range(wall_size):
+        jj = (j-wall_size/2) * 0.1
+        x_coordinates[num_agents + 200 + j] = w/2 + jj
+        y_coordinates[num_agents + 200 + j] = h/2 + jj*wall_inclination
 
 
 def try_move(x, y, d, v):
@@ -144,8 +157,8 @@ def plot(x, y):
 
 new_movement = True
 
-def sim(p_num_agents, num_its, do_plot):
-    init(p_num_agents)
+def sim(p_num_agents, num_its, wall_index, do_plot):
+    init(p_num_agents, wall_index)
     if do_plot:
         init_plotting()
     global x_coordinates, y_coordinates
@@ -198,9 +211,9 @@ if __name__ == '__main__':
     density = np.zeros(len(peds))
 
     for it, i in enumerate(peds):
-        kl[it],avg_speed[it], density[it] = sim(i, 1000, False)
-
+        kl[it], avg_speed[it], density[it] = sim(i, 1000, 1, False)
         print(i)
+
     #plt.plot(peds, kl)
     #plt.plot(peds, avg_speed)
     plt.plot(peds, density)
