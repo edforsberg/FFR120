@@ -5,6 +5,7 @@ import matplotlib.patches as plt_patches
 from PedSim import *
 from matplotlib.collections import PatchCollection
 from KeepLeft import *
+from AvgSpees import *
 pedestrian_radius = 0.1
 search_radius = 10 * pedestrian_radius
 global num_agents
@@ -148,6 +149,7 @@ def sim(p_num_agents, num_its, do_plot):
         init_plotting()
     global x_coordinates, y_coordinates
     kl = 0
+    avg_speed = 0
     teq = num_its/4;
     for i in range(num_its):
         update_pos(x_coordinates, y_coordinates)
@@ -175,19 +177,25 @@ def sim(p_num_agents, num_its, do_plot):
             elif x_coordinates[j] < 0-pedestrian_radius:
                 init_y()
                 x_coordinates[j] = w
+            if i>teq:
+                avg_speed += get_average_speed(dx, v, t, angle_from_index(j))
 
         if do_plot:
             plot(x_coordinates, y_coordinates)
         if i > teq:
             kl = kl + keep_left(y_coordinates[0:num_agents], h, direction)
-    return kl/(num_its-teq)
+    return kl/(num_its-teq), avg_speed/(num_agents*(num_its-teq))
+
+
 
 if __name__ == '__main__':
     peds = range(20, 100, 10)
     kl = np.zeros(len(peds))
+    avg_speed = np.zeros(len(peds))
 
     for it, i in enumerate(peds):
-        kl[it] = sim(i, 1000, False)
+        kl[it],avg_speed[it] = sim(i, 1000, False)
+
         print(i)
     plt.plot(peds, kl)
     plt.show()
