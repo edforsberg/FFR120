@@ -5,7 +5,7 @@ import matplotlib.patches as plt_patches
 from PedSim import *
 from matplotlib.collections import PatchCollection
 from KeepLeft import *
-from AvgSpees import *
+from AvgSpeed import *
 from CalcDensity import *
 pedestrian_radius = 0.1
 search_radius = 10 * pedestrian_radius
@@ -201,8 +201,9 @@ if __name__ == '__main__':
         kl[it],avg_speed[it], density[it] = sim(i, 1000, False)
 
         print(i)
-    plt.plot(peds, kl)
-    plt.plot(peds, avg_speed)
+    #plt.plot(peds, kl)
+    #plt.plot(peds, avg_speed)
+    plt.plot(peds, density)
     plt.show()
     print(kl)
 
