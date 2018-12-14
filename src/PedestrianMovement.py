@@ -30,22 +30,26 @@ def init_y():
 def init(p_num_agents, wall_index):
     global x_coordinates, y_coordinates, velocities, direction, num_agents
     num_agents = p_num_agents
-
     if wall_index == 1:
-        wall_size = 20
-        wall_inclination = 0.5
+        wall_size = h/2
+        wall_angle = np.pi/4
     elif wall_index == 2:
-        wall_size = 10
-        wall_inclination = 1
+        wall_size = h/2
+        wall_angle = np.pi/6
     elif wall_index == 3:
-        wall_size = 20
-        wall_inclination = 1
+        wall_size = h/2
+        wall_angle= np.pi/4
     else:
         wall_size = 0
-        wall_inclination = 0
+        wall_angle = 0
 
-    x_coordinates = np.zeros((num_agents + 200 + wall_size, 1))
-    y_coordinates = np.zeros((num_agents + 200 + wall_size, 1))
+    # comment out the next ine if we want wall_angle close to horizontal.
+    # otherwise div by zero.
+    wall_size /= np.arccos(wall_angle)
+    num_wall_pieces = int(np.round(wall_size/(pedestrian_radius*2)));
+
+    x_coordinates = np.zeros((num_agents + 200 + num_wall_pieces, 1))
+    y_coordinates = np.zeros((num_agents + 200 + num_wall_pieces, 1))
     velocities = np.zeros((num_agents, 1))
     direction = np.zeros((num_agents, 1))
 
@@ -69,10 +73,10 @@ def init(p_num_agents, wall_index):
         y_coordinates[num_agents + 100 + i] = lower_wall_y[i]
 
     # Add some obstacle in the walkway.
-    for j in range(wall_size):
-        jj = (j-wall_size/2) * 0.1
-        x_coordinates[num_agents + 200 + j] = w/2 + jj
-        y_coordinates[num_agents + 200 + j] = h/2 + jj*wall_inclination
+    for j in range(num_wall_pieces):
+        jj = (j-num_wall_pieces/2)/num_wall_pieces*wall_size
+        x_coordinates[num_agents + 200 + j] = w/2 + jj*np.cos(wall_angle)
+        y_coordinates[num_agents + 200 + j] = h/2 + jj*np.sin(wall_angle)
 
 
 def try_move(x, y, d, v):
@@ -187,10 +191,8 @@ def sim(p_num_agents, num_its, wall_index, do_plot):
                 y_coordinates[j] = y
 
             if(x_coordinates[j] > w+pedestrian_radius):
-                init_y()
                 x_coordinates[j] = 0
             elif x_coordinates[j] < 0-pedestrian_radius:
-                init_y()
                 x_coordinates[j] = w
             if i>teq:
                 avg_speed += get_average_speed(dx, v, t, angle_from_index(j))
@@ -199,20 +201,27 @@ def sim(p_num_agents, num_its, wall_index, do_plot):
             plot(x_coordinates, y_coordinates)
         if i > teq:
             kl = kl + keep_left(y_coordinates[0:num_agents], h, direction)
-            density += calc_density(x_coordinates[0:num_agents], y_coordinates[0:num_agents])
+            density += calc_density(x_coordinates[0:num_agents], y_coordinates[0:num_agents], w)
     return kl/(num_its-teq), avg_speed/(num_agents*(num_its-teq)), density/(num_its-teq)
 
 
 
+
+
 if __name__ == '__main__':
+
+
     peds = range(20, 100, 10)
     kl = np.zeros(len(peds))
     avg_speed = np.zeros(len(peds))
     density = np.zeros(len(peds))
 
     for it, i in enumerate(peds):
-        kl[it], avg_speed[it], density[it] = sim(i, 1000, 1, False)
+        kl[it], avg_speed[it], density[it] = sim(i, 1000, 1, True)
         print(i)
+
+
+
 
     #plt.plot(peds, kl)
     #plt.plot(peds, avg_speed)
