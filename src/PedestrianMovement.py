@@ -46,7 +46,7 @@ def init(p_num_agents, wall_index):
     # comment out the next ine if we want wall_angle close to horizontal.
     # otherwise div by zero.
     wall_size /= np.arccos(wall_angle)
-    num_wall_pieces = int(np.round(wall_size/(pedestrian_radius*2)));
+    num_wall_pieces = int(np.round(wall_size/(pedestrian_radius*2))*2);
 
     x_coordinates = np.zeros((num_agents + 200 + num_wall_pieces, 1))
     y_coordinates = np.zeros((num_agents + 200 + num_wall_pieces, 1))
@@ -172,7 +172,7 @@ def sim(p_num_agents, num_its, wall_index, do_plot):
     teq = num_its/4;
     for i in range(num_its):
         update_pos(x_coordinates, y_coordinates)
-        x_coordinates,y_coordinates = collision_resoluton(x_coordinates, y_coordinates, pedestrian_radius)
+        x_coordinates,y_coordinates = collision_resoluton(x_coordinates, y_coordinates, pedestrian_radius, num_agents)
         for j in range(num_agents):
 
             x = x_coordinates[j]

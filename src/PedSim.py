@@ -16,12 +16,12 @@ def get_points_within_radius(p, xs, ys, radius):
 
     return np.array([x2, y2])
 
-def collision_resoluton(xs, ys, radius):
+def collision_resoluton(xs, ys, radius, num_agents):
     ic = kdtree.query_ball_tree(kdtree, radius*2)
 
-    for i in range(len(ic)):
+    for i in range(num_agents):
         for j in ic[i]:
-            if i >= j:
+            if i == j:
                 continue
             dx = xs[i]-xs[j]
             dy = ys[i]-ys[j]
@@ -30,10 +30,15 @@ def collision_resoluton(xs, ys, radius):
                 d = 1
                 dx = 1
                 dy = 0
-            xs[i] = xs[j] + dx / d * radius*2
-            ys[i] = ys[j] + dy / d * radius*2
-            xs[j] = xs[i] - dx / d * radius*2
-            ys[j] = ys[i] - dy / d * radius*2
+            xc = (xs[i]+xs[j])/2.0
+            yc = (ys[i]+ys[j])/2.0
+            rc = radius
+
+            xs[i] = xc + dx / d * rc
+            ys[i] = yc + dy / d * rc
+            if j < num_agents:
+                xs[j] = xc - dx / d * rc
+                ys[j] = yc - dy / d * rc
 
     return xs, ys
 
