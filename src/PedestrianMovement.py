@@ -217,7 +217,7 @@ if __name__ == '__main__':
     density = np.zeros(len(peds))
 
     for it, i in enumerate(peds):
-        kl[it], avg_speed[it], density[it] = sim(i, 1000, 1, True)
+        kl[it], avg_speed[it], density[it] = sim(50, 1000, 1, True)
         print(i)
 
 

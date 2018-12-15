@@ -8,7 +8,7 @@ def calc_density(xs, ys, w):
 
     for i in range(npts):
             tmp = abs(xs[i] - xs[0:i])
-            tmp = min(tmp, w-tmp)**2
+            tmp = np.minimum(tmp, w-tmp)**2
             counter += np.sum(tmp + (ys[i] - ys[0:i])**2)
 
     counter = 2*counter/(npts*(npts-1))

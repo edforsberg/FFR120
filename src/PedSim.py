@@ -26,6 +26,10 @@ def collision_resoluton(xs, ys, radius):
             dx = xs[i]-xs[j]
             dy = ys[i]-ys[j]
             d = np.sqrt(dx*dx + dy*dy)
+            if d == 0:
+                d = 1
+                dx = 1
+                dy = 0
             xs[i] = xs[j] + dx / d * radius*2
             ys[i] = ys[j] + dy / d * radius*2
             xs[j] = xs[i] - dx / d * radius*2
